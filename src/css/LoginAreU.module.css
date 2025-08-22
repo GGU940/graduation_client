@@ -1,0 +1,111 @@
+/* login, areu */
+.bg {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.loginCon,
+.areyouCon {
+    background-color: black;
+    padding: 120px;
+    height: min-content;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 100px;
+}
+
+span,
+p {
+    text-align: center;
+    font-size: 90px;
+    color: blue;
+}
+
+/* login */
+
+
+
+.textBox {
+    text-align: center;
+    width: 1600px;
+    font-size: 90px;
+    color: blue;
+    background-color: black;
+    padding: 40px 0;
+    border: 2px solid blue;
+}
+
+button {
+    font-size: 90px;
+    width: 20%;
+    padding: 20px;
+    border: 2px solid blue;
+    background-color: blue;
+    transition: .5s ease-in-out;
+}
+
+button:hover {
+    background-color: black;
+    cursor: pointer;
+    transition: .5s ease-in-out;
+    color: blue;
+}
+
+.btnOff {
+    opacity: 0;
+    scale: 0;
+}
+
+.btnOn {
+    opacity: 1;
+}
+
+.btnOff,
+.btnOn {
+    transition: opacity 1s ease-in-out;
+}
+
+/*areu  */
+.areyouCon>.checkContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 50px;
+    padding: 60px;
+    border: 2px solid blue;
+
+    opacity: 1;
+    max-height: 300px;
+    transform: scale(1);
+    transition: all 1s ease-in-out;
+    overflow: hidden;
+}
+
+.areyouCon>.checkContainer.active {
+    opacity: 0;
+    max-height: 0px;
+    transform: scale(0.9);
+    pointer-events: none;
+    padding: 0;
+    margin: 0;
+}
+
+.checkBox {
+    background-color: blue;
+    width: 100px;
+    height: 100px;
+}
+
+.msg {
+    font-size: 90px;
+    font-weight: bolder;
+    color: blue;
+}

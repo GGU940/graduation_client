@@ -1,0 +1,32 @@
+:root {
+    /* 컬러 변수 등록 */
+    --primary-color: #3880FF;
+    --primary-variant-color: #2F3C4F;
+    --accnet-color: #FF5F57;
+    --white: #fff;
+    --black: #000;
+
+}
+
+.App {
+    /* background-color: grey; */
+    /* border: 10px solid orange; */
+    width: 100vw;
+    height: 100vh;
+
+}
+
+.btn {
+    font-size: 100px;
+    position: relative;
+    bottom: -20;
+    left: -20;
+    cursor: pointer;
+    background-color: yellow;
+    border: 10px solid black;
+}
+
+.btn:hover {
+    background-color: orange;
+    font-weight: bold;
+}

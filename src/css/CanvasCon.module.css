@@ -1,0 +1,20 @@
+.CanvasCon {
+    width: 2160px;
+    height: 3840px;
+
+    border: 10px solid gray;
+    /* background-color: khaki; */
+
+    margin: auto;
+    cursor: none;
+}
+
+.customCursor {
+    position: fixed;
+    width: var(--cursor-size);
+    height: var(--cursor-size);
+    border: 8px solid palevioletred;
+    pointer-events: none;
+    /* 다른 요소 클릭 막지 않음 */
+    /* z-index: 9999; */
+}
