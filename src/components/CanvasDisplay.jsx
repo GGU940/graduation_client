@@ -23,7 +23,14 @@ const CanvasDisplay = () => {
     const [images, setImages] = useState([]); // 로드된 이미지 객체 배열
     const [currentIndex, setCurrentIndex] = useState(0); // 현재 보이는 이미지 인덱스
 
-    const [cutouts, setCutouts] = useState([]); // 잘라낸 이미지 조각들 저장
+    const [cutouts, setCutouts] = useState({
+        front: [],
+        back: [],
+        left: [],
+        right: []
+    }); // 잘라낸 이미지 조각들 저장
+
+    const [currentPlane, setCurrentPlane] = useState('front');// 현재 면
 
     const [isDragging, setIsDragging] = useState(false);
     const lastPosRef = useRef({ x: null, y: null });
@@ -93,7 +100,7 @@ const CanvasDisplay = () => {
             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
             /// 이전에 클릭해 저장한 이미지 조각들 그리기
-            cutouts.forEach((c) => {
+            cutouts[currentPlane].forEach((c) => {
                 ctx.drawImage(c.img, c.sx, c.sy, c.size, c.size, c.dx, c.dy, c.size, c.size);
                 //drawImage(그리고자 하는 이미지 객체, 원본 이미지에서 잘라낼 시작 x좌표, y좌표, 원본 이미지에서 잘라낼 너비, 높이, 캔버스에서 그릴 위치의 x좌표, y좌표, 캔버스에서 그려질 너비, 높이)
             });
@@ -105,7 +112,7 @@ const CanvasDisplay = () => {
             img.onload = draw; // 아직 로딩 중이면 onload로 대기
             img.onerror = () => console.error("이미지 로딩 실패:", img.src);
         }
-    }, [images, currentIndex, cutouts])
+    }, [images, currentIndex, cutouts, currentPlane])
 
 
     ///// 마우스 핸들러
@@ -172,18 +179,21 @@ const CanvasDisplay = () => {
 
 
         //► 잘라낼 정보 저장
-        setCutouts((prev) => [
-            ...prev,
-            {
-                img: currentImg,// 렌더링용 (Image 객체, 프론트에서만 사용)
-                imgSrc: currentImg.src, //서버 저장용 (문자열)
-                sx: cropX, // 원본 이미지에서 자를 좌표
-                sy: cropY,
-                dx: cropX,// 화면에 붙일 위치 
-                dy: cropY,
-                size: cursorSize, // ✅ 클릭 당시 커서 크기 저장
-            },
-        ]);
+        setCutouts((prev) => ({
+            ...prev,  // 기존의 front, back, left, right는 그대로 두고
+            [currentPlane]: [ // currentPlane 변수의 값만 덮어쓰기
+                ...prev[currentPlane], // 해당 면의 기존 조각들을 모두 복사한
+                {
+                    img: currentImg,// 렌더링용 (Image 객체, 프론트에서만 사용)
+                    imgSrc: currentImg.src, //서버 저장용 (문자열)
+                    sx: cropX, // 원본 이미지에서 자를 좌표
+                    sy: cropY,
+                    dx: cropX,// 화면에 붙일 위치 
+                    dy: cropY,
+                    size: cursorSize, // ✅ 클릭 당시 커서 크기 저장
+                }
+            ],
+        }));
         console.log("사각시작점>>", cropX, cropY);
     };
 
@@ -198,11 +208,20 @@ const CanvasDisplay = () => {
             console.log("***cutpout들:::", cutouts)
         }
 
+
+        const processedCutouts = Object.fromEntries(
+            Object.entries(cutouts).map(([plane, pieces]) => [
+                plane,
+                pieces.map(({ img, ...rest }) => rest)
+            ])
+        );
+
+
         //전송할 데이터 만들기 (img객체 제거)
         const payload = {
             userName: userName,
             timestamp: new Date().toISOString(),
-            cutouts: cutouts.map(({ img, ...rest }) => rest) // img만 제거한 나머지를 저장
+            cutouts: processedCutouts // img만 제거한 나머지를 저장
         };
 
         try {
