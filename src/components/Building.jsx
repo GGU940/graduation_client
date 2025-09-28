@@ -39,17 +39,19 @@ const Building = ({ cutoutsData, position }) => {
             ]);
 
 
+            const alphaTestValue = 0.01;
             // Three.js의 재질 순서: [오른쪽, 왼쪽, 위, 아래, 앞, 뒤]
             const finalMaterials = [
                 // map: 겉에 입힐 텍스처(이미지)
                 // transparent, opacity: 반투명 효과
                 // side: DoubleSide로 설정하여 안쪽 면도 보이게 함
-                new THREE.MeshStandardMaterial({ map: rightTexture, transparent: true, opacity: 0.8, side: THREE.DoubleSide }),
-                new THREE.MeshStandardMaterial({ map: leftTexture, transparent: true, opacity: 0.8, side: THREE.DoubleSide }),
+
+                new THREE.MeshStandardMaterial({ map: rightTexture, side: THREE.DoubleSide, alphaTest: alphaTestValue }),
+                new THREE.MeshStandardMaterial({ map: leftTexture, side: THREE.DoubleSide, alphaTest: alphaTestValue }),
                 invisibleMaterial, // 위
                 invisibleMaterial, // 아래
-                new THREE.MeshStandardMaterial({ map: frontTexture, transparent: true, opacity: 0.8, side: THREE.DoubleSide }),
-                new THREE.MeshStandardMaterial({ map: backTexture, transparent: true, opacity: 0.8, side: THREE.DoubleSide }),
+                new THREE.MeshStandardMaterial({ map: frontTexture, side: THREE.DoubleSide, alphaTest: alphaTestValue }),
+                new THREE.MeshStandardMaterial({ map: backTexture, side: THREE.DoubleSide, alphaTest: alphaTestValue }),
             ];
 
             // 생성된 재질 배열을 상태에 저장합니다.
@@ -83,6 +85,8 @@ const Building = ({ cutoutsData, position }) => {
             ))}
         </mesh>
     );
+
+
 };
 
 export default Building;
