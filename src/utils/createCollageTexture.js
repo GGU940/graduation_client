@@ -26,8 +26,8 @@ export const createCollageTexture = async (pieces, width = 450, height = 800) =>
     const ctx = canvas.getContext('2d');
 
     // 50% 투명도의 색으로 설정
-    ctx.fillStyle = 'rgba(255, 255,255, 0.2)';   // 스케치북 기본색. (이미지가 없는 빈 공간을 위함)
-    ctx.fillRect(0, 0, width, height);
+    // ctx.fillStyle = 'rgba(255, 255,255, 0.2)';   // 스케치북 기본색. (이미지가 없는 빈 공간을 위함)
+    // ctx.fillRect(0, 0, width, height);
 
     // 원본 캔버스(2160x3840)와 이 스케치북(450x800)의 크기 비율을 계산
     const scaleX = width / ORIGINAL_CANVAS_SIZE.width;   // 450 / 2160

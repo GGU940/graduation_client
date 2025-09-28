@@ -1,18 +1,11 @@
 
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { API_BASE } from '../store/ref';
 import useUIStore from '../store/uiStore';
 import '../css/common.css'
+
 // 이미지 파일 경로 리스트
 const imagePaths = [
-    // '/images/test001.png',
-    // '/images/test002.png',
-    // '/images/test003.png',
-    // '/images/building001.jpg',
-    // '/images/building002.jpg',
-    // '/images/building003.jpg',
-    // '/images/building004.jpg',
-
     '/images/artboard1.png',
     '/images/artboard2.png',
     '/images/artboard3.png',
@@ -24,6 +17,10 @@ const imagePaths = [
     '/images/artboard9.png',
 ];
 
+// 각 챕터의 이름(면)을 순서대로 정의
+const CHAPTER_PLANES = ['front', 'left', 'back', 'right'];
+const CHAPTER_DURATION = 10000; // 각 챕터 지속 시간 (10000ms = 10초)
+
 
 const CanvasDisplay = () => {
     const cursorSize = useUIStore((state) => state.cursorSize);
@@ -32,6 +29,12 @@ const CanvasDisplay = () => {
     const [userName, setUserName] = useState([]);
     const [images, setImages] = useState([]); // 로드된 이미지 객체 배열
     const [currentIndex, setCurrentIndex] = useState(0); // 현재 보이는 이미지 인덱스
+    const [isDragging, setIsDragging] = useState(false); //마우스를 드래그 중인지 
+    const lastPosRef = useRef({ x: null, y: null }); // 드래그 시 마지막 마우스 위치를 저장하기 위한 ref
+
+
+    const [currentChapter, setCurrentChapter] = useState(1); // 1, 2, 3, 4 챕터
+    const [timeLeft, setTimeLeft] = useState(CHAPTER_DURATION / 1000); // 남은 시간 (초 단위)
 
     const [cutouts, setCutouts] = useState({
         front: [],
@@ -40,18 +43,77 @@ const CanvasDisplay = () => {
         right: []
     }); // 잘라낸 이미지 조각들 저장
 
-    const [currentPlane, setCurrentPlane] = useState('front');// 현재 면
+    const currentPlane = CHAPTER_PLANES[currentChapter - 1];// 현재 면의 이름을 가져옴
 
-    const [isDragging, setIsDragging] = useState(false);
-    const lastPosRef = useRef({ x: null, y: null });
+
+
+
+    ////
+    // 저장 로직을 별도의 함수로 만들고, useCallback으로 감싸서 최적화합니다.
+    // useCallback은 의존성 배열(여기서는 [cutouts, userName])의 값이 바뀔 때만 함수를 새로 만듭니다.
+    // 이렇게 하지 않으면, 매 렌더링마다 함수가 새로 생성되어 useEffect 등에서 문제를 일으킬 수 있습니다.
+    const handleSaveCutouts = useCallback(async () => {
+
+        // 4개의 면을 모두 확인하여 저장할 데이터가 하나라도 있는지 검사
+        const totalCutouts = Object.values(cutouts).flat().length;
+        if (totalCutouts === 0) {
+            alert("저장할 cutouts 없음. 결과 페이지로 바로 이동");
+            window.location.href = "/total";
+            return;
+        } else {
+            console.log("------");
+            console.log("챕터 완료! 자동 저장을 시작");
+            console.log(cutouts);
+            console.log("------");
+        }
+
+        // 서버에는 이미지 객체(img)를 보낼 수 없으므로, 각 조각에서 img 속성을 제외한 나머지만 추출
+        const processedCutouts = Object.fromEntries(
+            Object.entries(cutouts).map(([plane, pieces]) => [
+                plane,
+                pieces.map(({ img, ...rest }) => rest)
+            ])
+        );
+
+        // 서버에 보낼 최종 데이터(payload)를 구성 (img객체 제거된)
+        const payload = {
+            // userName: userName,
+            userName: "임시",
+            timestamp: new Date().toISOString(),
+            cutouts: processedCutouts // img만 제거한 가공된 데이터
+        };
+
+        try {
+            const res = await fetch(`${API_BASE}/api/saveCutouts`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(payload),
+            });
+
+            const data = await res.json(); //json화 함
+            console.log("✅ res.json 저장 성공 응답:", data);
+            alert("✅ res.json 결과물 저장 성공")
+
+            // 저장이 끝나면 사용했던 사용자 이름을 localStorage에서 제거.
+            localStorage.removeItem("userName");
+            window.location.href = "/total";
+
+        } catch (err) {
+            console.error("❌ 저장 실패:", err);
+            alert("저장 중 오류가 발생했습니다.");
+        }
+    }, [cutouts, userName]); // cutouts나 userName이 바뀔 때만 이 함수를 새로 만듦
 
 
 
     //이미지 객체 로딩 : 이미지 미리 로딩. 렌더 전 준비용
     useEffect(() => {
-        console.log("***Start****")
-
-        setUserName(localStorage.getItem("userName"));
+        const storedUserName = localStorage.getItem("userName");
+        if (storedUserName) {
+            setUserName(storedUserName);
+        }
 
         const loaded = imagePaths.map((src) => {
             const img = new Image(); //JavaScript에서 DOM 없이도 이미지 객체를 생성할 수 있는 내장 클래스
@@ -59,11 +121,11 @@ const CanvasDisplay = () => {
             return img;
         })
         setImages(loaded);//loaded는 Image 객체들의 배열
-        console.log('로드된 배열:', loaded);
+        // console.log('로드된 배열:', loaded);
     }, []);
 
 
-    // 5초마다 이미지 인덱스 currentIndex 자동 순환
+    // ?초마다 이미지 인덱스 currentIndex 자동 순환
     useEffect(() => {
         const interval = setInterval(() => {
             setCurrentIndex((prev) => (prev + 1) % imagePaths.length)
@@ -74,6 +136,42 @@ const CanvasDisplay = () => {
         //setInterval을 사용하면 브라우저 메모리에 타이머가 남아 있기 때문에, 
         //clearInterval로 꼭 제거해야 메모리 누수/중복 실행 방지됨
     }, [])
+
+
+
+    // 챕터 자동 전환, 자동 저장 로직
+    useEffect(() => {
+        // 현재 챕터가 4를 초과했다면 (즉, 5가 되었다면) 모든 과정이 끝난 것이므로,
+        // 저장 함수를 호출하고 이 useEffect의 나머지 로직은 실행하지 않습니다.
+        if (currentChapter > 4) {
+            handleSaveCutouts();
+            return;
+        }
+
+        // 10초(CHAPTER_DURATION) 후에 다음 챕터로 넘어가도록 타이머를 설정
+        const chapterTimer = setTimeout(() => {
+            setCurrentChapter(prevChater => prevChater + 1); // 현재 챕터 번호 + 1.
+            setTimeLeft(CHAPTER_DURATION / 1000); // 다음 챕터가 시작될 때 남은 시간을 다시 10초로 초기화
+        }, CHAPTER_DURATION);
+
+
+        //화면에 남은 시간을 1초마다 업데이트 하기 위한 인터벌(반복 실행) 설정
+        const countdownInterval = setInterval(() => {
+            setTimeLeft(prevTime => (prevTime > 0 ? prevTime - 1 : 0));
+        }, 1000);
+
+        // 이 useEffect의 '정리(cleanup)' 함수입니다.
+        // 컴포넌트가 사라지거나, 의존성 배열([currentChapter, handleSaveCutouts])의 값이 바뀌어
+        // useEffect가 다시 실행되기 직전에 호출됩니다.
+        // 기존에 설정된 타이머와 인터벌을 제거하여 메모리 누수나 중복 실행을 방지하는 매우 중요한 부분입니다.
+        return () => {
+            clearTimeout(chapterTimer);
+            clearInterval(countdownInterval);
+        };
+    }, [currentChapter]); // currentChapter가 바뀔 때마다 이 로직을 다시 실행
+    // }, [currentChapter, handleSaveCutouts]); // currentChapter가 바뀔 때마다 이 로직을 다시 실행
+
+
 
 
 
@@ -102,7 +200,7 @@ const CanvasDisplay = () => {
                 return;
             }
 
-            console.log("🎨 draw 실행!!!!")
+            // console.log("🎨 draw 실행!!!!")
 
             // 6. 캔버스 전체를 지워서 이전 그림 제거
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -110,10 +208,13 @@ const CanvasDisplay = () => {
             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
             /// 이전에 클릭해 저장한 이미지 조각들 그리기
-            cutouts[currentPlane].forEach((c) => {
-                ctx.drawImage(c.img, c.sx, c.sy, c.size, c.size, c.dx, c.dy, c.size, c.size);
-                //drawImage(그리고자 하는 이미지 객체, 원본 이미지에서 잘라낼 시작 x좌표, y좌표, 원본 이미지에서 잘라낼 너비, 높이, 캔버스에서 그릴 위치의 x좌표, y좌표, 캔버스에서 그려질 너비, 높이)
-            });
+            // currentPlane이 유효하고(예: 'front'), cutouts 객체 안에 해당 키가 존재하면 그 배열을 순회하며 그립니다.
+            if (currentPlane && cutouts[currentPlane]) {
+                cutouts[currentPlane].forEach((c) => {
+                    ctx.drawImage(c.img, c.sx, c.sy, c.size, c.size, c.dx, c.dy, c.size, c.size);
+                    //drawImage(그리고자 하는 이미지 객체, 원본 이미지에서 잘라낼 시작 x좌표, y좌표, 원본 이미지에서 잘라낼 너비, 높이, 캔버스에서 그릴 위치의 x좌표, y좌표, 캔버스에서 그려질 너비, 높이)
+                });
+            }
         }
 
         if (img.complete) {  // 배경 이미지가 이미 로드되어 있으면 
@@ -122,7 +223,7 @@ const CanvasDisplay = () => {
             img.onload = draw; // 아직 로딩 중이면 onload로 대기
             img.onerror = () => console.error("이미지 로딩 실패:", img.src);
         }
-    }, [images, currentIndex, cutouts, currentPlane])
+    }, [images, currentIndex, cutouts, currentPlane]);
 
 
     ///// 마우스 핸들러
@@ -209,72 +310,34 @@ const CanvasDisplay = () => {
 
 
 
-    //저장 핸들러
-    const handleSaveCutouts = async () => {
-        if (cutouts.length === 0) {
-            alert("저장할 cutouts 없음");
-            return;
-        } else {
-            console.log("***cutpout들:::", cutouts)
-        }
-
-
-        const processedCutouts = Object.fromEntries(
-            Object.entries(cutouts).map(([plane, pieces]) => [
-                plane,
-                pieces.map(({ img, ...rest }) => rest)
-            ])
-        );
-
-
-        //전송할 데이터 만들기 (img객체 제거)
-        const payload = {
-            userName: userName,
-            timestamp: new Date().toISOString(),
-            cutouts: processedCutouts // img만 제거한 나머지를 저장
-        };
-
-        try {
-            const res = await fetch(`${API_BASE}/api/saveCutouts`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(payload),
-            });
-
-            const data = await res.json(); //json화 함
-            console.log("✅ res.json 저장 성공:", data);
-            alert("✅ res.json 저장 성공")
-
-            //초기화
-            localStorage.clear();
-            window.location.href = "/";
-
-        } catch (err) {
-            console.error("❌ 저장 실패:", err);
-            alert("저장 중 오류가 발생했습니다.");
-        }
-    };
 
 
 
     return (
         <div>
             <h1 style={{ fontSize: 50 }}>{userName}</h1>
+            <div style={{ position: 'fixed', top: 20, left: 20, zIndex: 10, color: 'white', fontSize: '2rem', background: 'rgba(0,0,0,0.5)', padding: '10px', borderRadius: '8px' }}>
+                {currentChapter <= 4 ? (
+                    <>
+                        <h2>Chapter {currentChapter} / 4: "{currentPlane}" 면 조립 중</h2>
+                        <p>남은 시간: {timeLeft}초</p>
+                    </>
+                ) : (
+                    // 챕터가 끝나면 저장 중이라는 메시지를 보여줍니다.
+                    <h3>모든 면 완성! 결과물을 저장합니다...</h3>
+                )}
+            </div>
+
             <canvas
                 ref={canvasRef}
                 width={2160}
                 height={3840}
-                style={{ /*cursor: 'none',*/ display: 'block', border: '10px solid blue' }}
+                style={{ /*cursor: 'none',*/ display: 'block', /*border: '10px solid blue' */ }}
                 onMouseDown={handleMouseDown}
                 onMouseMove={handleMouseMove}
                 onMouseUp={handleMouseUp}
             />
-            <button
-                onClick={handleSaveCutouts}
-                className="btn"
-            >저장</button>
+
         </div >
 
     );
