@@ -5,13 +5,23 @@ import useUIStore from '../store/uiStore';
 import '../css/common.css'
 // 이미지 파일 경로 리스트
 const imagePaths = [
-    '/images/test001.png',
-    '/images/test002.png',
-    '/images/test003.png',
+    // '/images/test001.png',
+    // '/images/test002.png',
+    // '/images/test003.png',
     // '/images/building001.jpg',
     // '/images/building002.jpg',
     // '/images/building003.jpg',
     // '/images/building004.jpg',
+
+    '/images/artboard1.png',
+    '/images/artboard2.png',
+    '/images/artboard3.png',
+    '/images/artboard4.png',
+    '/images/artboard5.png',
+    '/images/artboard6.png',
+    '/images/artboard7.png',
+    '/images/artboard8.png',
+    '/images/artboard9.png',
 ];
 
 

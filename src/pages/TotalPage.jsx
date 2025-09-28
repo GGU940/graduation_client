@@ -39,7 +39,7 @@ const TotalPage = () => {
                 dpr: 기기의 픽셀 비율에 맞춰 선명하게 렌더링합니다.
                 camera: 3D 공간을 바라보는 '카메라'의 초기 위치와 시야각(fov)을 설정합니다.
             */}
-            <Canvas dpr={[1, 2]} camera={{ fov: 45, position: [0, 5, 10] /*[X, Y, Z] */ }}>
+            <Canvas dpr={[1, 2]} camera={{ fov: 65, position: [0, 5, 10] /*[X, Y, Z] */ }}>
 
 
                 {/* 
