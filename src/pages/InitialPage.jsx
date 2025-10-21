@@ -1,128 +1,76 @@
-import React, { useState, useRef, useEffect } from 'react'
-import FaceChecker from '../components/FaceCheckerLive'
+import React, { Suspense, useRef } from 'react'
+import { Canvas, useFrame } from '@react-three/fiber'
+import { useGLTF, OrbitControls, Environment, } from '@react-three/drei'; // 헬퍼 라이브러리
+
 import style from '../css/InitialPage.module.css'
-import Hello from '../components/Hello'
-import { createNoise3D } from 'simplex-noise';
+
+
+/**
+ * 3D 모델(.glb)을 로드하고 씬(scene)을 반환하는 내부 컴포넌트
+ * 모델 로직을 별도 컴포넌트로 분리하면 Suspense 적용에 유리하다.
+ */
+function Model() {
+    //useGLTF 훅을 사용해 .glb 파일을 로드
+    const { scene } = useGLTF('../../models/icon1.glb');
+
+    //ref 생성 -> 모델 참조
+    const modelRef = useRef();
+    // 4. useFrame 훅: 매 프레임마다 실행되는 애니메이션 루프
+    // (state, delta) -> delta는 프레임 간의 시간 간격 (애니메이션을 부드럽게 함)
+    useFrame((state, delta) => {
+        // 5. ref.current가 존재하면 (모델이 로드되면)
+        if (modelRef.current) {
+            // 6. 모델의 Y축 회전(rotation.y) 값을 매 프레임마다 조금씩 증가시킨다.
+            // delta * 0.5 에서 0.5는 회전 속도. 값을 조절하면 속도가 바뀐다.
+            modelRef.current.rotation.y += delta * 0.5;
+        }
+    });
+
+
+
+    //  <primitive> 태그는 R3F(설계도 뉘앙스)가 아닌 Three.js 객체(scene)를 직접 렌더링할 때 사용한다.
+    // object 속성에 로드한 scene을 전달한다.
+    // scale={1.0}은 모델의 크기를 1배로 설정 (0.5로 하면 절반 크기)
+    return <primitive
+        ref={modelRef}
+        object={scene}
+        scale={1.0}
+        position={[0, -1, 0]} />;
+}
+
 
 const InitialPage = () => {
 
-    const [init, setInit] = useState(true);
-
-    const canvasRef = useRef(null);
-    const noise3D = createNoise3D();
-
-    // InitialPage.jsx 안 useEffect 대체
-    useEffect(() => {
-        const canvas = canvasRef.current;
-        const ctx = canvas.getContext('2d');
-
-        // 해상도 세팅 (DPR 대응, 한 번만)
-        const dpr = window.devicePixelRatio || 1;
-        const resize = () => {
-            const w = window.innerWidth;
-            const h = window.innerHeight;
-            // CSS 크기
-            canvas.style.width = w + 'px';
-            canvas.style.height = h + 'px';
-
-            // 실제 픽셀 크기
-            // canvas.width = w * dpr;
-            // canvas.height = h * dpr;
-            canvas.width = w;
-            canvas.height = h;
-
-            ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // 고해상도 대응
-        };
-        resize();
-        window.addEventListener('resize', resize);
-
-        // 파라미터: 잘 보이게 조절
-        const scale = 3;   // 숫자 작을수록 무늬 큼 (15~40 추천)
-        const speed = 0.0008; // 시간 스케일 (크면 빨리 움직임)
-        const alpha = 0;  // 0~255 (100~180 추천)
-
-        // 성능 최적화: 샘플 스텝
-        const step = 3; // 1이면 모든 픽셀, 2~3으로 올리면 빨라짐(약간 픽셀리 느낌)
-
-        let rafId;
-        const render = (t) => {
-            // t는 ms (requestAnimationFrame이 넘겨줌)
-            const time = t * speed; // z축에 시간 반영
-
-            const w = Math.floor(canvas.clientWidth);
-            const h = Math.floor(canvas.clientHeight);
-            const imageData = ctx.createImageData(w, h);
-            const px = imageData.data;
-
-            // 샘플 스텝 적용 루프
-            for (let y = 0; y < h; y += step) {
-                for (let x = 0; x < w; x += step) {
-                    const v = (noise3D(x / scale, y / scale, time) + 1) * 0.5; // 0~1
-                    const shade = (v * 255) | 0;
-                    // 작은 블록 채우기
-                    for (let oy = 0; oy < step; oy++) {
-                        const yy = y + oy;
-                        if (yy >= h) break;
-                        for (let ox = 0; ox < step; ox++) {
-                            const xx = x + ox;
-                            if (xx >= w) break;
-                            const i = (yy * w + xx) * 4;
-                            px[i] = shade;
-                            px[i + 1] = shade;
-                            px[i + 2] = shade;
-                            px[i + 3] = alpha; // 불투명도
-                        }
-                    }
-                }
-            }
-
-            ctx.putImageData(imageData, 0, 0);
-            rafId = requestAnimationFrame(render);
-        };
-
-        rafId = requestAnimationFrame(render);
-
-        return () => {
-            cancelAnimationFrame(rafId);
-            window.removeEventListener('resize', resize);
-        };
-    }, []);
 
 
 
 
     return (
-        <article className={style.InitialPageCompo}>
-            <h1 style={{ display: 'none' }}>StartPage</h1>
-
-            <canvas
-                ref={canvasRef}
-                className={style.noiseCanvas}
-            />
+        <section className={style.pageBG}>
+            <div className={style.iconBox}>
+                <div className={style.iconImg}>
+                    <Canvas camera={{ position: [0, 2, 8], fov: 20 }} > {/*  3D 씬을 렌더링할 캔버스  position:[x, y, z], fov(시야각):클 수록 광각렌즈*/}
 
 
-            {/* 얼굴 감지 컴포넌트 */}
-            <FaceChecker
-                onApproach={() => {
-                    console.log("🍎🍎🍎🍎🍎🍎얼굴인식완_startPage");
-                    setInit(false);// state 변경
-                }}
-                onLeave={() => {
-                    console.log("💙💙💙💙💙💙💙얼굴 사라짐_startPage ");
-                    setInit(true);
-                }}
-            />
+                        <Suspense fallback={null}>{/*  모델이 로드될 때까지 대기 (fallback={null}은 로딩 중 아무것도 표시 안 함) */}
+                            <Model />
+                            <Environment preset="studio" intensity={2} /> 모델을 비추는 기본 조명 설정 (없으면 검게 보임)
 
-            {/* state에 따라 컴포넌트 표시 */}
-            {!(init) &&
-                // <p style={{ position: 'relative', zIndex: 2, fontSize: 100, color: '#fff' }}>시작???</p>
-                <div className={style.contentBox}>
-                    < Hello />
+                        </Suspense>
+
+
+                        <OrbitControls enableZoom={false} /> {/* 360도 회전 컨트롤러 (줌 비활성화, 자동 회전) */}
+                    </Canvas>
+                </div>
+                <div className={style.iconName}>
+                    <span> 1/∞  </span>
+                    <span>  제목  </span>
+                    <span>  2025</span>
 
                 </div>
-            }
+            </div>
 
-        </article>)
+        </section>)
 
 }
 

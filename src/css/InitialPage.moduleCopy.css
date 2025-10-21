@@ -1,0 +1,107 @@
+.InitialPageCompo {
+    /* border: 4px solid blue; */
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    /* background-color: red; */
+    background-image: url('../../public/images/vine.png');
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    overflow: hidden;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+
+.InitialPageCompo::before,
+.InitialPageCompo::after {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+}
+
+
+
+
+.InitialPageCompo::before {
+    content: "";
+    background-color: #000000;
+    opacity: .5;
+}
+
+.InitialPageCompo::after {
+    content: "";
+    /* background-image: url('../../public/images/vine_green.png');
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    overflow: hidden; */
+    /* background-color: #006137; */
+    background-color: #000;
+    mix-blend-mode: saturation;
+    opacity: 1;
+}
+
+.noiseCanvas {
+    /* border: 2px solid lawngreen; */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 2;
+    /* mix-blend-mode: multiply; */
+    mix-blend-mode: color-dodge;
+    /* 배경과 합성 */
+}
+
+
+.contentBox {
+    /* border: 4px solid yellow; */
+    z-index: 3;
+}
+
+
+
+/* 공통 */
+
+.contentText {
+    display: inline-block;
+    min-height: 1em;
+    /* 폰트 크기에 맞는 최소 높이를 지정 (값은 폰트 크기에 따라 조절) */
+    /* border: 4px solid green; */
+    position: relative;
+    font-size: 90px;
+    color: var(--primary-color);
+    background-color: #000000;
+    padding: 12px 200px;
+
+}
+
+:global(.typed-cursor) {
+    /* border: 2px solid yellow; */
+    color: var(--primary-color);
+    /* font-weight: 300; */
+    /* 100~900 사이 값으로 조절 */
+    display: none;
+}
+
+
+/* ** components/Hello.jsx ** */
+
+.HelloCompo {
+    /* border: 4px solid red; */
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+}
