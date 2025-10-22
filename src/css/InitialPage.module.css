@@ -13,8 +13,10 @@
 .iconBox {
     position: relative;
     /* border: 8px solid white; */
-    width: 1400px;
-    height: 1800px;
+    /* width: 1400px;
+    height: 1800px; */
+    width: calc(100vw / 5);
+    height: calc(100vh / 5);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -24,9 +26,13 @@
 
 
 .iconImg {
-    /* background-color: aqua; */
     width: 100%;
     height: 100%;
+
+}
+
+.iconImg.active {
+    background-color: white;
 
 }
 
@@ -36,15 +42,17 @@
 
 .iconName {
     /* border: 8px solid red; */
+
     width: 100%;
     display: flex;
     justify-content: center;
     gap: 80px;
     position: absolute;
-    bottom: -160px;
+    bottom: -40px;
 }
 
 .iconName>span {
+    font-size: 16pt;
     color: white;
-    /* text-shadow: 0 10px 30px rgba(0, 0, 0, 1); */
+    text-shadow: 0 20px 5px rgba(0, 0, 0, 1);
 }
