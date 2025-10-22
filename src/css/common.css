@@ -1,3 +1,24 @@
+@font-face {
+    font-family: 'EllisDigitalCoding400';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_220508@1.0/EliceDigitalBaeum_Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'EllisDigitalCoding700';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_220508@1.0/EliceDigitalBaeum_Bold.woff2') format('woff2');
+    font-weight: 700;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Orbit';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2310@1.0/Orbit-Regular.woff2') format('woff2');
+    font-weight: normal;
+    font-display: swap;
+}
+
 :root {
     /* 컬러 변수 등록 */
     --primary-color: #3880FF;
@@ -6,6 +27,7 @@
     --white: #fff;
     --black: #000;
 
+    font-family: 'Orbit';
 }
 
 .App {

@@ -1,11 +1,11 @@
-import React, { Suspense, useRef } from 'react'
+import React, { Suspense, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { useGLTF, OrbitControls, Environment, } from '@react-three/drei'; // 헬퍼 라이브러리
 
 import style from '../css/InitialPage.module.css'
 
 
-/**
+/**---------------
  * 3D 모델(.glb)을 로드하고 씬(scene)을 반환하는 내부 컴포넌트
  * 모델 로직을 별도 컴포넌트로 분리하면 Suspense 적용에 유리하다.
  */
@@ -26,8 +26,6 @@ function Model() {
         }
     });
 
-
-
     //  <primitive> 태그는 R3F(설계도 뉘앙스)가 아닌 Three.js 객체(scene)를 직접 렌더링할 때 사용한다.
     // object 속성에 로드한 scene을 전달한다.
     // scale={1.0}은 모델의 크기를 1배로 설정 (0.5로 하면 절반 크기)
@@ -37,24 +35,122 @@ function Model() {
         scale={1.0}
         position={[0, -1, 0]} />;
 }
-
+//-----------------------------
 
 const InitialPage = () => {
 
+    const [iconCenter, setIconCenter] = useState({ x: 0, y: 0 });
+
+    const lineRef = useRef(null);
+    const iconRef = useRef(null); //.iconBox div를 DOM에서 직접 선택하기 위한 useRef 
+    const timerRef = useRef(null);
+
+    useEffect(() => {
+
+        // 마우스가 움직일 때마다 
+        const handleMouseMove = (e) => {
+            // 'lineRef'에 담긴 실제 DOM 엘리먼트에 직접 접근
+            if (lineRef.current) {
+                // React 리렌더링 없이 DOM 속성(attribute)을 바로 변경
+                lineRef.current.setAttribute('x1', e.clientX);
+                lineRef.current.setAttribute('y1', e.clientY);
+
+                // 랜덤 굵기도 여기서 직접 설정 (React 렌더링과 분리)
+                const randomWidth = [Math.random() * 36] + 4;
+                lineRef.current.setAttribute('stroke-width', randomWidth);
+
+                //React State 대신 DOM 스타일을 '보이게' 변경
+                lineRef.current.style.display = 'block';
+            }
 
 
+            // 이전에 설정된 타이머가 있다면 '취소'
+            if (timerRef.current) {
+                clearTimeout(timerRef.current);
+            }
+            timerRef.current = setTimeout(() => {
+                if (lineRef.current) {
+                    lineRef.current.style.display = 'none';
+                }
+            }, 100)
+        };
+
+        // 이벤트 리스너 등록
+        window.addEventListener('mousemove', handleMouseMove);
+
+        return () => {
+            window.removeEventListener('mousemove', handleMouseMove);
+        };
+
+    }, [])
+
+
+
+    //중심점 위치 찾기
+    useLayoutEffect(() => {
+        const updateIconCenter = () => {
+            if (iconRef.current) {
+                // divRef.current (즉, .iconBox div)의 현재 화면상 위치와 크기 정보를 'rect' 객체로 반환받는다.
+                // (rect 객체에는 left, top, right, bottom, width, height 등이 들어있음)
+                const rect = iconRef.current.getBoundingClientRect();
+
+                setIconCenter({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 });
+            }
+        };
+
+        updateIconCenter();// 컴포넌트가 처음 마운트될 때 중심점을 계산하기 위해 한 번 즉시 실행
+
+
+        // --- 이벤트 리스너 등록 ---
+        // 브라우저 창 크기가 바뀔 때마다('resize'),스크롤 이벤트가 발생할 때마다('scroll') updateDivCenter 함수를 다시 실행
+        window.addEventListener('resize', updateIconCenter);
+        window.addEventListener('scroll', updateIconCenter, true);//'true' 옵션 (Capture Phase): 스크롤 이벤트가 버블링되기 전에 먼저 감지
+
+
+        // --- 클린업(Cleanup) 함수 ---
+        return () => {
+            window.removeEventListener('resize', updateIconCenter);
+            window.removeEventListener('scroll', updateIconCenter, true);
+        };
+    }, []);
+
+    // iconCenter state가 변경될 때마다 실행되는 Effect
+    useEffect(() => {
+        // lineRef.current가 존재하고 (즉, <line>이 렌더링되었고)
+        if (lineRef.current) {
+            // div의 중심점(x2, y2) 속성을 DOM에 직접 업데이트
+            lineRef.current.setAttribute('x2', iconCenter.x);
+            lineRef.current.setAttribute('y2', iconCenter.y);
+        }
+    }, [iconCenter]); // iconCenter state가 바뀔 때만 이 코드가 실행됨
 
 
     return (
         <section className={style.pageBG}>
-            <div className={style.iconBox}>
+            <svg className={style.lineSvg}>
+
+                <line
+                    //시작점
+                    ref={lineRef}
+                    //끝점
+                    x2={iconCenter.x}
+                    y2={iconCenter.y}
+                    //style
+                    stroke='white'
+                    style={{ display: 'none' }}
+                // strokeWidth={(Math.random() * 20 + 25)}
+                />
+            </svg>
+            <div
+                className={style.iconBox}
+                ref={iconRef}>
                 <div className={style.iconImg}>
                     <Canvas camera={{ position: [0, 2, 8], fov: 20 }} > {/*  3D 씬을 렌더링할 캔버스  position:[x, y, z], fov(시야각):클 수록 광각렌즈*/}
 
 
                         <Suspense fallback={null}>{/*  모델이 로드될 때까지 대기 (fallback={null}은 로딩 중 아무것도 표시 안 함) */}
                             <Model />
-                            <Environment preset="studio" intensity={2} /> 모델을 비추는 기본 조명 설정 (없으면 검게 보임)
+                            <Environment preset="studio" intensity={2} /> {/*모델을 비추는 기본 조명 설정 (없으면 검게 보임)*/}
 
                         </Suspense>
 
@@ -64,7 +160,7 @@ const InitialPage = () => {
                 </div>
                 <div className={style.iconName}>
                     <span> 1/∞  </span>
-                    <span>  제목  </span>
+                    <span>  Instance01  </span>
                     <span>  2025</span>
 
                 </div>
