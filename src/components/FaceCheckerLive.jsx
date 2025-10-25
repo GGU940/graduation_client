@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
+import style from '../css/InitialPage.module.css'
 
 
 const FaceCheckerLive = ({
@@ -23,6 +24,7 @@ const FaceCheckerLive = ({
     minStreak = 3,
     isFace,
     setIsFace,
+    faceTiming
 }) => {
 
     const videoRef = useRef(null);      // <video> DOM 참조 (브라우저 카메라(웹캠)에서 들어오는 영상을 <video>에 꽂아둬야 함. 화면에 안 보여도 '입력 소스'로 쓰임) 
@@ -259,9 +261,9 @@ const FaceCheckerLive = ({
 
 
 
-        <div
+        <div className={style.faceCheckerBox}
             style={{
-                width: `${isFace ? ' 70%' : '0%'}`, height: `${isFace ? ' 80%' : '0%'}`, overflow: 'hidden'
+                width: `${faceTiming ? ' 60%' : '0%'}`, height: `${faceTiming ? ' 80%' : '0%'}`, overflow: 'hidden',
                 // border: '2px solid green'
             }}
         >

@@ -1,16 +1,43 @@
 /* login, areu */
-.bg {
-    position: absolute;
-    left: 0;
-    top: 0;
+.loginBox {
+    font-size: 1rem;
+    color: #fff;
+    border: 1px solid olivedrab;
+    position: relative;
+    /* position: absolute;
+    left: 0;*/
+    bottom: 0;
     width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
+    /* height: 100%; */
+    /* background-color: rgba(0, 0, 0, 0.8); */
     display: flex;
+    flex-direction: column;
+    gap: 5rem;
     justify-content: center;
     align-items: center;
 }
 
+.titleBox {
+    /* border: 1px solid skyblue; */
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+
+
+.explainBox {
+    padding: 1.5rem;
+    background-color: rgba(0, 0, 0, 0.7);
+    /* border: 1px solid ghostwhite; */
+    width: 100vw;
+    text-align: center;
+    line-height: 1.5rem;
+}
+
+
+
+
+/* 
 .loginCon,
 .areyouCon {
     background-color: black;
@@ -22,14 +49,7 @@
     gap: 100px;
 }
 
-span,
-p {
-    text-align: center;
-    font-size: 90px;
-    color: blue;
-}
 
-/* login */
 
 
 
@@ -72,8 +92,8 @@ button:hover {
 .btnOn {
     transition: opacity 1s ease-in-out;
 }
-
-/*areu  */
+*/
+/* areu 
 .areyouCon>.checkContainer {
     display: flex;
     justify-content: center;
@@ -108,4 +128,4 @@ button:hover {
     font-size: 90px;
     font-weight: bolder;
     color: blue;
-}
+}  */

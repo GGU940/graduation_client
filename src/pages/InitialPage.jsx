@@ -2,6 +2,7 @@ import React, { Suspense, useEffect, useLayoutEffect, useRef, useState } from 'r
 import { Canvas, useFrame } from '@react-three/fiber'
 import { useGLTF, OrbitControls, Environment, } from '@react-three/drei'; // 헬퍼 라이브러리
 
+import Login from '../components/Login';
 import FaceChecker from '../components/FaceCheckerLive'
 import style from '../css/InitialPage.module.css'
 
@@ -39,13 +40,19 @@ function Model() {
 //-----------------------------
 
 const InitialPage = () => {
-
     const [iconCenter, setIconCenter] = useState({ x: 0, y: 0 });
-    const [isFace, setIsFace] = useState(false);
+    const [isFace, setIsFace] = useState(false); //얼굴인식 여부
+    const [faceTiming, setFaceTiming] = useState(false); //화면에 나오는
+
+
+    const [isIconActive, setIsIconActive] = useState(false);
+    const [isIconHoverd, setIsIconHoverd] = useState(false);
 
     const lineRef = useRef(null);
     const iconRef = useRef(null); //.iconBox div를 DOM에서 직접 선택하기 위한 useRef 
     const timerRef = useRef(null);
+
+
 
     useEffect(() => {
 
@@ -86,7 +93,48 @@ const InitialPage = () => {
 
     }, [])
 
+    useEffect(() => {
+        if (iconRef.current) {
+            if (isIconHoverd) {
+                iconRef.current.classList.add(style.iconHoverd);
+            } else {
+                iconRef.current.classList.remove(style.iconHoverd);
+            }
+        }
+    }, [isIconHoverd])
 
+
+    useEffect(() => {
+        if (isIconActive) {
+            console.log("isIconActive!!!!!")
+            iconRef.current.classList.remove(style.iconHoverd);
+        }
+    }, [isIconActive])
+
+
+    useEffect(() => {
+        let timeoutId;
+        //재귀 setTImeout
+        const blinkStep = () => {
+            if (!isFace) { return; }//얼굴 안보일때 멈춤
+
+            setFaceTiming(prev => !prev);
+            let randomTimeShort = Math.floor(Math.random() * 701) + 100;
+            let randomTimeLong = Math.floor(Math.random() * 1500) + 1500;
+            const delay = faceTiming ? randomTimeLong : randomTimeShort;//다음 지연 시간 결정
+
+            timeoutId = setTimeout(blinkStep, delay);
+        };
+
+        if (isFace) {
+            timeoutId = setTimeout(blinkStep, 10);//첫 실행
+        } else {
+            setFaceTiming(false);
+        }
+        return () => {
+            if (timeoutId) clearTimeout(timeoutId);
+        };
+    }, [isFace])
 
     //중심점 위치 찾기
     useLayoutEffect(() => {
@@ -127,6 +175,7 @@ const InitialPage = () => {
     }, [iconCenter]); // iconCenter state가 바뀔 때만 이 코드가 실행됨
 
 
+
     return (
         <section className={style.pageBG}>
             <svg className={style.lineSvg}>
@@ -145,14 +194,19 @@ const InitialPage = () => {
             </svg>
             <div
                 className={style.iconBox}
-                ref={iconRef}>
+                ref={iconRef}
+                onClick={() => setIsIconActive(true)}
+                onMouseEnter={isIconActive ? null : () => setIsIconHoverd(true)}
+                onMouseLeave={isIconActive ? null : () => setIsIconHoverd(false)}
+            >
+
                 <div className={style.iconImg}>
                     <FaceChecker
                         isFace={isFace}
                         setIsFace={setIsFace}
-
+                        faceTiming={faceTiming}
                     />
-                    {isFace ? '' : (
+                    {faceTiming ? '' : (
                         <Canvas camera={{ position: [0, 2, 8], fov: 20 }} > {/*  3D 씬을 렌더링할 캔버스  position:[x, y, z], fov(시야각):클 수록 광각렌즈*/}
 
 
@@ -170,9 +224,10 @@ const InitialPage = () => {
                 </div>
 
                 <div className={style.iconName}>
-                    <span> 1/∞  </span>
-                    <span>  Instance01  </span>
-                    <span>  2025</span>
+                    <Login
+                        isIconActive={isIconActive}
+                        isIconHoverd={isIconHoverd}
+                    />
 
                 </div>
             </div>
