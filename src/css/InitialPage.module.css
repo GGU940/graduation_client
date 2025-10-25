@@ -15,8 +15,8 @@
     /* border: 1px solid white; */
     /* width: 1400px;
     height: 1800px; */
-    width: calc(100vw / 5);
-    height: calc(100vh / 5);
+    width: 240px;
+    height: 320px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -30,7 +30,9 @@
 .iconImg {
     width: 100%;
     height: 100%;
-
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .iconImg.active {
@@ -38,11 +40,12 @@
 
 }
 
-/* 
+
 .iconImg>* {
-   border: 6px solid greenyellow; 
+    /* border: 2px solid greenyellow; */
+    /* background-color: rgba(255, 255, 255, .2); */
 }
-*/
+
 .iconName {
     /* border: 8px solid red; */
 
@@ -51,11 +54,11 @@
     justify-content: center;
     gap: 30px;
     position: absolute;
-    bottom: -10px;
+    bottom: -1.5rem;
 }
 
 .iconName>span {
-    font-size: 16pt;
+    font-size: 1rem;
     color: #fff;
     /* text-shadow: 0 0px 5px rgb(0, 38, 255); */
 

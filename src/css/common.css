@@ -17,6 +17,7 @@
     src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2310@1.0/Orbit-Regular.woff2') format('woff2');
     font-weight: normal;
     font-display: swap;
+
 }
 
 :root {
@@ -28,6 +29,7 @@
     --black: #000;
 
     font-family: 'Orbit';
+    /* 1rem = 16px */
 }
 
 .App {

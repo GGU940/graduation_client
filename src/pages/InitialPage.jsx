@@ -2,6 +2,7 @@ import React, { Suspense, useEffect, useLayoutEffect, useRef, useState } from 'r
 import { Canvas, useFrame } from '@react-three/fiber'
 import { useGLTF, OrbitControls, Environment, } from '@react-three/drei'; // 헬퍼 라이브러리
 
+import FaceChecker from '../components/FaceCheckerLive'
 import style from '../css/InitialPage.module.css'
 
 
@@ -40,6 +41,7 @@ function Model() {
 const InitialPage = () => {
 
     const [iconCenter, setIconCenter] = useState({ x: 0, y: 0 });
+    const [isFace, setIsFace] = useState(false);
 
     const lineRef = useRef(null);
     const iconRef = useRef(null); //.iconBox div를 DOM에서 직접 선택하기 위한 useRef 
@@ -145,19 +147,28 @@ const InitialPage = () => {
                 className={style.iconBox}
                 ref={iconRef}>
                 <div className={style.iconImg}>
-                    <Canvas camera={{ position: [0, 2, 8], fov: 20 }} > {/*  3D 씬을 렌더링할 캔버스  position:[x, y, z], fov(시야각):클 수록 광각렌즈*/}
+                    <FaceChecker
+                        isFace={isFace}
+                        setIsFace={setIsFace}
+
+                    />
+                    {isFace ? '' : (
+                        <Canvas camera={{ position: [0, 2, 8], fov: 20 }} > {/*  3D 씬을 렌더링할 캔버스  position:[x, y, z], fov(시야각):클 수록 광각렌즈*/}
 
 
-                        <Suspense fallback={null}>{/*  모델이 로드될 때까지 대기 (fallback={null}은 로딩 중 아무것도 표시 안 함) */}
-                            <Model />
-                            <Environment preset="studio" intensity={2} /> {/*모델을 비추는 기본 조명 설정 (없으면 검게 보임)*/}
+                            <Suspense fallback={null}>{/*  모델이 로드될 때까지 대기 (fallback={null}은 로딩 중 아무것도 표시 안 함) */}
+                                <Model />
+                                <Environment preset="studio" intensity={2} /> {/*모델을 비추는 기본 조명 설정 (없으면 검게 보임)*/}
 
-                        </Suspense>
+                            </Suspense>
 
 
-                        <OrbitControls enableZoom={false} /> {/* 360도 회전 컨트롤러 (줌 비활성화, 자동 회전) */}
-                    </Canvas>
+                            <OrbitControls enableZoom={false} /> {/* 360도 회전 컨트롤러 (줌 비활성화, 자동 회전) */}
+                        </Canvas>
+                    )}
+
                 </div>
+
                 <div className={style.iconName}>
                     <span> 1/∞  </span>
                     <span>  Instance01  </span>
