@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+// import {persist} from 'zustan'
 
 const currentNameStore = create((set) => ({
     currentName: localStorage.getItem("userName") || "",  // 초기값 로컬스토리지에서 불러오기
