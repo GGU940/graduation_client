@@ -29,6 +29,15 @@
 
 }
 
+@keyframes myRotation1 {
+    from {
+        transform: rotate(0);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
 
 
 .loadingBg.showError {
@@ -59,15 +68,6 @@
     padding: 0.5em;
 }
 
-@keyframes myRotation1 {
-    from {
-        transform: rotate(0);
-    }
-
-    to {
-        transform: rotate(360deg);
-    }
-}
 
 @keyframes myRotation2 {
     from {

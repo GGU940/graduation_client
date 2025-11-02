@@ -59,8 +59,10 @@ const QuestionCon = () => {
     return (<TransitionGroup component={null}>
 
         <CSSTransition
+            in={true}      // ✅ 1. 애니메이션 스위치를 켭니다.
+            appear={true}  // ✅ 2. 컴포넌트가 처음 나타날 때 애니메이션을 실행합니다.
             key="step3-qna"
-            timeout={300}
+            timeout={600}//  300ms(opacity) + 300ms(delay)
             classNames={{ // ✅ 여기도 동일하게
                 enter: style.slideEnter,
                 enterActive: style.slideEnterActive,
@@ -71,15 +73,15 @@ const QuestionCon = () => {
             }}
             nodeRef={nodeRef1}>
 
-            <div className={style.slideBox}>
+            <div className={style.slideBox} ref={nodeRef1}>
 
                 {questionList.map((q, index) => {
-                    if (answerList[index - 1] !== 0 || index == 0) {
+                    if (answerList[index - 1] !== 0 || index === 0) {
 
                         return (
 
 
-                            <div className={style.qBox} ref={nodeRef1}>
+                            <div className={style.qBox} key={index}>
 
                                 <p ref={allTypedRefs[index]}>
                                     {q}
@@ -95,7 +97,7 @@ const QuestionCon = () => {
                                     <label>
                                         <input
                                             type="checkbox"
-                                            onchange={() => { setAnswerList[index](2); console.log("clickkkkk") }}
+                                            onChange={() => { setAnswerList[index](2); console.log("clickkkkk") }}
                                         /> 선택2
                                     </label>
                                 </div>
@@ -104,6 +106,7 @@ const QuestionCon = () => {
 
                         )
                     }
+                    return null; // map에서는 항상 return 값이 있는 것이 좋습니다.
                 })}
 
                 <div className={style.recaptchaBox}>
