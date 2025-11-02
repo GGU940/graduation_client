@@ -2,26 +2,30 @@ import React, { Suspense, useEffect, useLayoutEffect, useRef, useState } from 'r
 import { Canvas, useFrame } from '@react-three/fiber'
 import { useGLTF, OrbitControls, Environment, } from '@react-three/drei'; // 헬퍼 라이브러리
 
+import style from '../css/InitialPage.module.css'
+import currentNameStore from '../store/currentNameStore';
+
 import Login from '../components/Login';
 import FaceChecker from '../components/FaceCheckerLive'
-import style from '../css/InitialPage.module.css'
-
+import QuestionCon from '../components/QuestionCon';
+import Loading from '../components/Loading';
 
 /**---------------
  * 3D 모델(.glb)을 로드하고 씬(scene)을 반환하는 내부 컴포넌트
  * 모델 로직을 별도 컴포넌트로 분리하면 Suspense 적용에 유리하다.
  */
-function Model() {
+function Model({ modelStop }) {
     //useGLTF 훅을 사용해 .glb 파일을 로드
     const { scene } = useGLTF('../../models/icon1.glb');
 
     //ref 생성 -> 모델 참조
     const modelRef = useRef();
+
     // 4. useFrame 훅: 매 프레임마다 실행되는 애니메이션 루프
     // (state, delta) -> delta는 프레임 간의 시간 간격 (애니메이션을 부드럽게 함)
     useFrame((state, delta) => {
         // 5. ref.current가 존재하면 (모델이 로드되면)
-        if (modelRef.current) {
+        if (modelRef.current && !modelStop) {
             // 6. 모델의 Y축 회전(rotation.y) 값을 매 프레임마다 조금씩 증가시킨다.
             // delta * 0.5 에서 0.5는 회전 속도. 값을 조절하면 속도가 바뀐다.
             modelRef.current.rotation.y += delta * 0.5;
@@ -47,14 +51,24 @@ const InitialPage = () => {
 
     const [isIconActive, setIsIconActive] = useState(false);
     const [isIconHoverd, setIsIconHoverd] = useState(false);
+    const [modelStop, setModelStop] = useState(false);
+    const [loading, setLoading] = useState(false);
+
+    const isLogin = currentNameStore((state) => state.currentName);
+    const setIsLogin = currentNameStore((state) => state.setCurrentName);
+    const resetLogin = currentNameStore((state) => state.resetCurrentName);
 
     const lineRef = useRef(null);
     const iconRef = useRef(null); //.iconBox div를 DOM에서 직접 선택하기 위한 useRef 
     const timerRef = useRef(null);
 
+    const [goNext, setGoNext] = useState(null);
 
 
     useEffect(() => {
+        console.log("~~~~~~ 페이지 마운팅 댐 ~~~~~~~")
+        resetLogin()
+        console.log("%%%%%%%% isLogin : ", isLogin)
 
         // 마우스가 움직일 때마다 
         const handleMouseMove = (e) => {
@@ -92,6 +106,16 @@ const InitialPage = () => {
         };
 
     }, [])
+
+    useEffect(() => {
+        if (isLogin) {
+            console.log("로그인됌??????", isLogin);
+            setLoading(true);
+        } else {
+            setLoading(false);
+        }
+
+    }, [isLogin])
 
     useEffect(() => {
         if (iconRef.current) {
@@ -178,20 +202,22 @@ const InitialPage = () => {
 
     return (
         <section className={style.pageBG}>
-            <svg className={style.lineSvg}>
+            {isLogin === "" && (
+                <svg className={style.lineSvg}>
 
-                <line
-                    //시작점
-                    ref={lineRef}
-                    //끝점
-                    x2={iconCenter.x}
-                    y2={iconCenter.y}
-                    //style
-                    stroke='white'
-                    style={{ display: 'none' }}
-                // strokeWidth={(Math.random() * 20 + 25)}
-                />
-            </svg>
+                    <line
+                        //시작점
+                        ref={lineRef}
+                        //끝점
+                        x2={iconCenter.x}
+                        y2={iconCenter.y}
+                        //style
+                        stroke='white'
+                        style={{ display: 'none' }}
+                    // strokeWidth={(Math.random() * 20 + 25)}
+                    />
+                </svg>
+            )}
             <div
                 className={style.iconBox}
                 ref={iconRef}
@@ -201,17 +227,28 @@ const InitialPage = () => {
             >
 
                 <div className={style.iconImg}>
-                    <FaceChecker
-                        isFace={isFace}
-                        setIsFace={setIsFace}
-                        faceTiming={faceTiming}
-                    />
+                    {loading && goNext !== 'Question' ?
+                        <Loading
+                            errorText={[`${isLogin}님을 접속하는 데에 실패하였습니다.`, '새로운 연결을 위한 인증 절차를 진행합니다.']}
+                            nextStep={'Question'}
+                            setModelStop={setModelStop}
+                            setGoNext={setGoNext} />
+                        : ''}
+
+                    {!isLogin &&
+                        <FaceChecker
+                            isFace={isFace}
+                            setIsFace={setIsFace}
+                            faceTiming={faceTiming}
+
+                        />}
+
                     {faceTiming ? '' : (
                         <Canvas camera={{ position: [0, 2, 8], fov: 20 }} > {/*  3D 씬을 렌더링할 캔버스  position:[x, y, z], fov(시야각):클 수록 광각렌즈*/}
 
 
                             <Suspense fallback={null}>{/*  모델이 로드될 때까지 대기 (fallback={null}은 로딩 중 아무것도 표시 안 함) */}
-                                <Model />
+                                <Model modelStop={modelStop} />
                                 <Environment preset="studio" intensity={2} /> {/*모델을 비추는 기본 조명 설정 (없으면 검게 보임)*/}
 
                             </Suspense>
@@ -223,15 +260,24 @@ const InitialPage = () => {
 
                 </div>
 
+
                 <div className={style.iconName}>
                     <Login
                         isIconActive={isIconActive}
                         isIconHoverd={isIconHoverd}
+                        isLogin={isLogin}
+                        setIsLogin={setIsLogin}
                     />
 
                 </div>
             </div>
 
+            {/* Qe*/}
+
+
+            {goNext === 'Question' &&
+                <QuestionCon />
+            }
         </section>)
 
 }

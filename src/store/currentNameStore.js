@@ -10,6 +10,7 @@ const currentNameStore = create((set) => ({
     resetCurrentName: () => {
         localStorage.removeItem("userName");
         set({ currentName: "" });
+        console.log("zusand resetLogin 실행됨!!")
     }
 }));
 

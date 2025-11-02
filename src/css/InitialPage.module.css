@@ -6,88 +6,12 @@
     height: 100vh;
 
     display: flex;
+    justify-content: space-around;
     justify-content: center;
     align-items: center;
-}
-
-.iconBox {
-    position: relative;
-    width: 240px;
-    height: 320px;
-    display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    gap: 80px;
-
-    transition: 0.2s;
+    gap: 50px;
 }
-
-/* .iconBox:hover {
-    outline: 2px solid rgba(255, 255, 255, 0.5);
-    border-radius: 0.25rem;
-    box-shadow: 0 0px 5px rgb(0, 0, 0);
-    background-color: rgba(16, 58, 211, 0.7);
-    cursor: pointer;
-
-} */
-
-.iconBox.iconHoverd {
-    outline: 2px solid rgba(255, 255, 255, 0.5);
-    border-radius: 0.25rem;
-    box-shadow: 0 0px 5px rgb(0, 0, 0);
-    background-color: rgba(16, 58, 211, 0.7);
-    cursor: pointer;
-
-}
-
-/* .iconBox::after {
-    content: "clickᅳstart";
-position: absolute;
-top: 0;
-left: 0;
-width: 100%;
-height: 100%;
-display: flex;
-align-items: center;
-justify-content: center;
-text-shadow: 0 0 1rem rgb(16, 58, 211);
-color: white;
-}
-
-*/
-
-.iconImg {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    /* border: 2px solid greenyellow; */
-    /* perspective: 1000px; */
-}
-
-
-
-.iconName {
-    /* border: 1px solid red; */
-
-    width: 100%;
-    /* display: flex;
-    justify-content: center;
-    align-items: center; */
-    /* gap: 30px; */
-    position: absolute;
-
-    top: 100%;
-    margin-top: 0.5rem;
-    /*  padding: 0.2rem 0 0.3rem 0; */
-}
-
-/* .iconName>span {
-
-
-} */
-
 
 
 .lineSvg {
@@ -100,6 +24,60 @@ color: white;
     height: 100vh;
 }
 
+.iconBox {
+    /* border: 2px solid blueviolet; */
+    position: relative;
+    width: 240px;
+    height: 320px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 0.5rem;
+
+    transition: 0.2s;
+}
+
+
+
+.iconBox.iconHoverd {
+    outline: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 0.25rem;
+    box-shadow: 0 0px 5px rgb(0, 0, 0);
+    background-color: rgba(16, 58, 211, 0.7);
+    cursor: pointer;
+
+}
+
+
+.iconImg {
+    width: 100%;
+    height: 100%;
+    /* min-height: calc(100% - 1rem); */
+    min-height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* border: 2px solid greenyellow; */
+    /* perspective: 1000px; */
+}
+
+
+
+.iconName {
+    /* border: 1px solid red; */
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    /* justify-content: center; */
+    align-items: center;
+    gap: 2rem;
+    height: auto;
+    box-sizing: border-box;
+
+}
+
+
+
 
 /* login jsx */
 
@@ -108,12 +86,8 @@ color: white;
 
     /* border: 1px solid olivedrab; */
     position: relative;
-    /* position: absolute;
-    left: 0;*/
-    bottom: 0;
     width: 100%;
-    /* height: 100%; */
-    /* background-color: rgba(0, 0, 0, 0.8); */
+    height: auto;
     display: flex;
     flex-direction: column;
     gap: 5rem;
@@ -123,7 +97,7 @@ color: white;
 
 .titleBox {
     color: #fff;
-    border: 1px solid skyblue;
+    /* border: 1px solid skyblue; */
     border-radius: 0.5rem;
 
     transition: 0.2s;
@@ -144,52 +118,19 @@ color: white;
 
 }
 
-/* .iconBox:hover .titleBox {
-    background-color: rgba(16, 58, 211, 0.7);
-    border-radius: 0.25rem;
-    outline: 2px solid rgba(255, 255, 255, 0.5);
 
-} */
-
-.explainBox {
-    background-color: white;
-    width: 100vw;
-    text-align: center;
-    height: 0rem;
-    transition: 0.4s;
-    visibility: hidden;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
-.explainBox span {
+.explainTyped {
+    /* border: 2px solid navy; */
     color: #000000;
-    /* display: none; */
     line-height: 1.5rem;
 }
 
-/* .iconBox:hover .explainBox {
-    visibility: visible;
-    height: 20rem;
-} */
-
-.explainBox.iconHoverd {
-    visibility: visible;
-    height: 20rem;
-}
-
-
 .titleBox form {
-    border: 1px solid red;
+    /* border: 1px solid red; */
     width: auto;
 }
 
 .renameInput {
-    /* flex-shrink: 1;
-    flex-grow: 0;
-    min-width: 0; */
 
     text-align: center;
     color: #fff;
@@ -200,4 +141,84 @@ color: white;
     border-radius: 0.25rem;
     outline: 2px solid rgba(255, 255, 255, 0.5);
     width: 120px;
+}
+
+
+
+/* slide box ㅠㅠㅠㅠ */
+
+.slideBox {
+    /* border: 2px solid yellow; */
+    background-color: white;
+    width: 100vw;
+    text-align: center;
+    transition: 0.4s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 0;
+}
+
+.slideEnter {
+    opacity: 0;
+    transform: scaleY(0);
+    visibility: hidden;
+}
+
+.slideEnterActive {
+    opacity: 1;
+    transform: scaleY(1);
+    visibility: visible;
+    transition: opacity 0.3s, transform 0.3s 0.3s;
+}
+
+.slideEnterDone {
+    opacity: 1;
+    transform: scaleY(1);
+    visibility: visible;
+}
+
+.slideExit {
+    opacity: 1;
+    transform: scaleY(1);
+    visibility: visible;
+}
+
+.slideExitActive {
+    opacity: 0;
+    transform: scaleY(0);
+    visibility: hidden;
+    transition: opacity 0.3s, transform 0.3s;
+}
+
+.slideExitDone {
+    opacity: 0;
+    transform: scaleY(0);
+    visibility: hidden;
+}
+
+
+
+
+
+.qBox {
+    padding: calc(1 / 3vh);
+    border: 1px solid red;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    animation: enterAni 1s ease-out 1 forwards;
+    /* height: calc(1 / 3vh); */
+}
+
+.inputBox {
+    border: 1px solid blue;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 200px;
 }
