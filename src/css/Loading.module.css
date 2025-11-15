@@ -29,6 +29,10 @@
 
 }
 
+.compltSymbol {
+    stroke: blue;
+}
+
 @keyframes myRotation1 {
     from {
         transform: rotate(0);
@@ -48,7 +52,8 @@
     /* padding: 1rem; */
 }
 
-.errorSymbol {
+.errorSymbol,
+.questionSymbol {
     animation: myRotation2 2s infinite linear;
 }
 

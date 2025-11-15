@@ -4,7 +4,6 @@ import { useGLTF, OrbitControls, Environment, } from '@react-three/drei'; // 헬
 
 import style from '../css/InitialPage.module.css'
 import currentNameStore from '../store/currentNameStore';
-
 import Login from '../components/Login';
 import FaceChecker from '../components/FaceCheckerLive'
 import QuestionCon from '../components/QuestionCon';
@@ -63,6 +62,7 @@ const InitialPage = () => {
     const timerRef = useRef(null);
 
     const [goNext, setGoNext] = useState(null);
+    const [initialPageExit, setInitialPageExit] = useState(false);
 
 
     useEffect(() => {
@@ -275,8 +275,8 @@ const InitialPage = () => {
             {/* Qe*/}
 
 
-            {goNext === 'Question' &&
-                <QuestionCon />
+            {goNext === 'Question' ?
+                <QuestionCon /> : ''
             }
         </section>)
 

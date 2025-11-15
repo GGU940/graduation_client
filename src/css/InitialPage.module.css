@@ -146,74 +146,96 @@
 
 
 /* slide box ㅠㅠㅠㅠ */
-
+/* slide box ㅠㅠㅠㅠ */
 .slideBox {
-    /* border: 2px solid yellow; */
+    /* ...기존 스타일... */
     background-color: white;
     width: 100vw;
     text-align: center;
-    /* transition: 0.4s; */
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     padding: 3rem 0;
+
+    /* 💡 1. (필수) 내용물이 삐져나오지 않게 숨깁니다. */
+    overflow: hidden;
 }
 
 .slideEnter {
     opacity: 0;
-    transform: scaleY(0);
+    /* 💡 2. scaleY 대신 max-height를 0으로 설정합니다. */
+    max-height: 0;
+    /* 💡 3. 패딩도 0으로 만들어 완전히 접히게 합니다. */
+    padding-top: 0;
+    padding-bottom: 0;
     visibility: hidden;
 }
 
 .slideEnterActive {
     opacity: 1;
-    transform: scaleY(1);
+    /* 💡 4. scaleY 대신 max-height를 충분히 큰 값으로 설정합니다. */
+    max-height: 100vh;
+    /* (내용물보다 크기만 하면 됩니다) */
     visibility: visible;
-    transition: opacity 0.3s, transform 0.3s 0.3s;
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+
+    /* 💡 5. transition 대상을 max-height와 padding으로 변경합니다. 
+       (timeout={600}에 맞게 0.6초로 설정) */
+    transition: opacity 0.3s, max-height 0.6s, padding 0.6s;
 }
 
 .slideEnterDone {
     opacity: 1;
-    transform: scaleY(1);
     visibility: visible;
+    /* 💡 6. 애니메이션 후에는 max-height를 해제해 자연스러운 높이를 갖게 합니다. */
+    max-height: none;
 }
+
+/* --- Exit 애니메이션도 동일하게 수정 --- */
 
 .slideExit {
     opacity: 1;
-    transform: scaleY(1);
+    max-height: 100vh;
     visibility: visible;
+    padding-top: 3rem;
+    padding-bottom: 3rem;
 }
 
 .slideExitActive {
     opacity: 0;
-    transform: scaleY(0);
+    max-height: 0;
     visibility: hidden;
-    transition: opacity 0.3s, transform 0.3s;
+    padding-top: 0;
+    padding-bottom: 0;
+    /* 💡 7. transition 대상 변경 */
+    transition: opacity 0.3s, max-height 0.6s, padding 0.6s;
 }
 
 .slideExitDone {
     opacity: 0;
-    transform: scaleY(0);
+    max-height: 0;
     visibility: hidden;
 }
 
-
-
-
+/* ---- */
 
 .qBox {
-    padding: calc(1 / 3vh);
-    border: 1px solid red;
+    height: calc(100vh / 3);
+    /* padding: calc(1 / 3vh); */
+    /* border: 1px solid red; */
     width: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     gap: 1rem;
-    animation: enterAni 1s ease-out 1 forwards;
+    /* animation: enterAni 1s ease-out 1 forwards; */
     /* height: calc(1 / 3vh); */
 }
+
+
 
 .inputBox {
     border: 1px solid blue;
@@ -221,4 +243,15 @@
     align-items: center;
     justify-content: center;
     gap: 200px;
+}
+
+.qbox .inputBox input {
+    border: 1px solid green;
+    background-color: aqua;
+
+}
+
+.qSubmit {
+    border: 1px solid indigo;
+    height: 200px;
 }

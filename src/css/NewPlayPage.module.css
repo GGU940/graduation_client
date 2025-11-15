@@ -1,8 +1,100 @@
 .newPlayPageCompo {
-    background-color: bisque;
+    background-color: gainsboro;
     width: 100vw;
     height: 100vh;
     display: flex;
+    /* justify-content: space-evenly; */
+    flex-direction: column;
+    /* align-items: center; */
+    padding: 100px;
+}
+
+.orderDiv {
+    border: 1px solid rebeccapurple;
+    background-color: blue;
+    width: 100%;
+    height: min-content;
+    padding: 40px;
+    font-size: 2rem;
+    display: flex;
+    gap: 40px;
+    flex-direction: column;
+    align-items: center;
+    color: white;
+}
+
+.orderText {
+    /* justify-content: stretch; */
+    border: 1px solid green;
+    text-align: center;
+    width: fill;
+}
+
+.countNum {
+    /* border: 1px solid snow; */
+    width: fit-content;
+}
+
+.signboardDiv {
+    padding: 40px;
+    /* border: 2px solid red; */
+    width: 100%;
+    height: 60%;
+    min-height: 1200px;
+    overflow: hidden;
+
+    display: grid;
+    place-items: center;
+
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+}
+
+.imgBox {
+    /* border: 1px solid hotpink; */
+    /* background-color: white; */
+    width: min-content;
+    height: min-content;
+    padding: 20px;
+    display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.imgBox>img {
+    border: 1px solid sandybrown;
+}
+
+.imgBox>span {
+    max-width: 400px;
+    white-space: nowrap;
+    color: blue;
+}
+
+.imgBox:hover {
+    border: 2px solid blue;
+}
+
+
+
+
+.playboardDiv {
+    /* border: 2px solid rgb(0, 94, 255); */
+    width: 100%;
+    height: 40%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+/*  */
+.userCanvas {
+    background-color: white;
+    width: 1800px;
+    height: 800px;
+    position: relative;
+    /* aspect-ratio: 9 / 4; */
 }

@@ -4,6 +4,7 @@ import { Routes, Route } from "react-router-dom";
 import TotalPage from "./pages/TotalPage";
 import InitialPage from './pages/InitialPage';
 import NewPlayPage from './pages/NewPlayPage';
+import NewTotalPage from './pages/NewTotalPage';
 
 import CanvasCon from "./components/CanvasCon";
 import Login from "./components/Login";
@@ -20,8 +21,9 @@ function App() {
 
         <Route path="/areyou" element={<AreU />} />
         <Route path="/play" element={<CanvasCon />} />
-        <Route path="/newplay" element={<NewPlayPage />} />
         <Route path="/total" element={<TotalPage />} />
+        <Route path="/newplay" element={<NewPlayPage />} />
+        <Route path="/newtotal" element={<NewTotalPage />} />
       </Routes>
 
     </div>

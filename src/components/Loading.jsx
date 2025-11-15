@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react'
 import style from "../css/Loading.module.css"
 import { useTypingSequence } from '../utils/useTypingSequene';
-import LoadingIcon from './LoadingIcon';
+import SVGicon from './SVGicon';
 
 const Loading = ({
     errorText = '',
@@ -72,7 +72,7 @@ const Loading = ({
         <div className={`${style.loadingBg} ${showError ? style.showError : ''}`}>
             {loadingMotion ? (
                 <>
-                    <LoadingIcon color={'#fff'} />
+                    <SVGicon color={'#fff'} kind={'arrow'} />
 
                     <p className={style.loadingText} ref={typedRef1}>
                         {loadingText}
@@ -82,14 +82,11 @@ const Loading = ({
 
                 (setModelStop &&
                     <>
-                        <svg className={style.errorSymbol} width="60" height="60" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 2L2 22H22L12 2Z" fill="#ff0000" stroke="#ff0000" stroke-width="2" />
-                            <path d="M12 8V13" stroke="black" stroke-width="2" stroke-linecap="butt" stroke-linejoin="round" />
-                            <circle cx="12" cy="17" r="1.5" fill="black" />
-                        </svg>
+                        <SVGicon color={'#ff0000'} kind={'error'} />
+
                         <div className={style.errorText} >
-                            {errorText.map((text) => {
-                                return (<p>
+                            {errorText.map((text, index) => {
+                                return (<p key={index}>
                                     {text}
                                 </p>
                                 )
