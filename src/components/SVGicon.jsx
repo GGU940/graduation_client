@@ -63,8 +63,8 @@ const SVGicon = ({ color, kind }) => {
 
         return (
             <svg className={style.errorSymbol} width="60" height="60" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2L2 22H22L12 2Z" fill="#ff0000" stroke="#ff0000" stroke-width="2" />
-                <path d="M12 8V13" stroke="black" stroke-width="2" stroke-linecap="butt" stroke-linejoin="round" />
+                <path d="M12 2L2 22H22L12 2Z" fill="#ff0000" stroke="#ff0000" strokeWidth="2" />
+                <path d="M12 8V13" stroke="black" strokeWidth="2" strokeLinecap="butt" strokeLinejoin="round" />
                 <circle cx="12" cy="17" r="1.5" fill="black" />
             </svg>
         )

@@ -137,6 +137,14 @@ const InitialPage = () => {
 
 
     useEffect(() => {
+        console.log('\n ********', initialPageExit)
+        if (initialPageExit === true) {
+            console.log('\n ********truetrue', initialPageExit)
+
+        }
+    }, [initialPageExit])
+
+    useEffect(() => {
         let timeoutId;
         //재귀 setTImeout
         const blinkStep = () => {
@@ -275,9 +283,15 @@ const InitialPage = () => {
             {/* Qe*/}
 
 
-            {goNext === 'Question' ?
-                <QuestionCon /> : ''
+            {goNext === 'Question' && initialPageExit === false ?
+                <QuestionCon setInitialPageExit={setInitialPageExit} /> : ''
             }
+
+            {initialPageExit === true && (
+                <div>
+                    ddd
+                </div>
+            )}
         </section>)
 
 }

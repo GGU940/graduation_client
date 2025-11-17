@@ -71,6 +71,28 @@ const UserCanvas = ({ columns, GAP }) => {
     }, [columns])
     return (
         <div className={style.userCanvas}>
+            {/* 2. 👇 [추가] 칼럼 테두리(Border) 렌더링 */}
+            {columnBorders.map((border) => (
+                <div
+                    key={border.key}
+                    style={{
+                        // 캔버스(userCanvas) 기준으로 절대 위치
+                        position: 'absolute',
+                        top: 0,
+                        left: `${border.x}px`, // 👈 실시간 계산된 X좌표
+                        width: `${border.width}px`, // 👈 실시간 계산된 너비
+                        height: '100%',
+                        // border: '1px solid rgba(255, 0, 0, 0.5)', // (빨간색)
+                        backgroundColor: 'grey', // (빨간색)
+                        boxSizing: 'border-box',
+                        pointerEvents: 'none',
+                        transition: 'width 0.3s',
+                    }}
+                />
+            ))}
+
+
+
             {
                 imagesToRender.map((img) => (
                     <img
@@ -88,23 +110,6 @@ const UserCanvas = ({ columns, GAP }) => {
                     />
                 ))
             }
-            {/* 2. 👇 [추가] 칼럼 테두리(Border) 렌더링 */}
-            {columnBorders.map((border) => (
-                <div
-                    key={border.key}
-                    style={{
-                        // 캔버스(userCanvas) 기준으로 절대 위치
-                        position: 'absolute',
-                        top: 0,
-                        left: `${border.x}px`, // 👈 실시간 계산된 X좌표
-                        width: `${border.width}px`, // 👈 실시간 계산된 너비
-                        height: '100%',
-                        border: '1px solid rgba(255, 0, 0, 0.5)', // (빨간색)
-                        boxSizing: 'border-box',
-                        pointerEvents: 'none',
-                    }}
-                />
-            ))}
 
         </div>
     )

@@ -183,7 +183,7 @@
 
     /* 💡 5. transition 대상을 max-height와 padding으로 변경합니다. 
        (timeout={600}에 맞게 0.6초로 설정) */
-    transition: opacity 0.3s, max-height 0.6s, padding 0.6s;
+    transition: opacity 0.3s, max-height 0.3s, padding 0.3s;
 }
 
 .slideEnterDone {
@@ -210,7 +210,7 @@
     padding-top: 0;
     padding-bottom: 0;
     /* 💡 7. transition 대상 변경 */
-    transition: opacity 0.3s, max-height 0.6s, padding 0.6s;
+    transition: opacity 0.3s, max-height 0.3s, padding 0.3s;
 }
 
 .slideExitDone {
@@ -221,28 +221,61 @@
 
 /* ---- */
 
+.questionEnter {
+    opacity: 0;
+    /* transform: translateY(30px); */
+    max-height: 0;
+    /* padding-top: 0; */
+    /* padding-bottom: 0; */
+    visibility: hidden;
+    overflow: hidden;
+}
+
+.questionEnterActive {
+    opacity: 1;
+    /* transform: translateY(0); */
+    transition: opacity 0.3s linear, max-height 0.3s linear;
+    /* (선택) slideBox가 나타난 후(600ms) 질문이 뜨도록 지연시간 */
+    /* transition-delay: 300ms; */
+
+    max-height: 100vh;
+    /* (내용물보다 크기만 하면 됩니다) */
+    visibility: visible;
+    overflow: hidden;
+}
+
 .qBox {
     height: calc(100vh / 3);
     /* padding: calc(1 / 3vh); */
-    /* border: 1px solid red; */
+    border: 1px solid red;
     width: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 1rem;
+    gap: 60px;
     /* animation: enterAni 1s ease-out 1 forwards; */
     /* height: calc(1 / 3vh); */
+    /* transition: height 0.3s; */
+    overflow: hidden;
+}
+
+.qBox.qBoxComplete {
+    /* justify-content: start; */
+    height: 500px;
+    /* (완료되었을 때 다른 스타일이 있다면 이곳에 추가) */
 }
 
 
 
 .inputBox {
-    border: 1px solid blue;
+    /* border: 1px solid darkorange; */
+    padding-bottom: 140px;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 200px;
+    flex-direction: column;
+    gap: 20px;
 }
 
 .qbox .inputBox input {
@@ -251,7 +284,29 @@
 
 }
 
+.qSubmitArea {
+    height: calc(100vh / 2);
+    border: 1px solid seagreen;
+    display: flex;
+    /* justify-content: center; */
+    align-items: center;
+}
+
 .qSubmit {
-    border: 1px solid indigo;
-    height: 200px;
+    /* position: absolute; */
+    /* bottom: 20px; */
+
+    border: 1px solid seashell;
+    height: 110px;
+    width: 300px;
+    cursor: pointer;
+    /* padding: 20px; */
+    color: white;
+    background-color: inherit;
+    font-size: inherit;
+}
+
+.qSubmit:hover {
+    background-color: blue;
+
 }

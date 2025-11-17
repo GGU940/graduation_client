@@ -1,64 +1,100 @@
-import React, { Suspense, useState } from 'react'
-// import style from '../css/NewTotalPage.module.css'
-import Model from '../components/Model';
-import { Environment, OrbitControls, } from '@react-three/drei';
+import React, { Suspense, useEffect, useState } from 'react'
+import io from 'socket.io-client'; // 👈 [추가]
+
 import { Canvas, } from '@react-three/fiber';
+import { Stage, OrbitControls, } from '@react-three/drei';
+import { API_BASE } from '../store/ref';
+
+import style from '../css/NewTotalPage.module.css'
+import LayoutBuilding from '../components/LayoutBuilding';
+
+//  NewPlayPage에서 사용했던 이미지 목록을 가져옵니다.
+import { allImages } from '../store/outputImagesInfo.js';
+// NewPlayPage와 동일한 로직으로 Webpack 경로 맵을 생성합니다.
+const imageContext = require.context(
+    '../outputImages', // Webpack이 찾을 위치
+    false,
+    /\.(jpe?g)$/i
+);
+const webpackNfdKeys = imageContext.keys();
+const webpackNfcKeys = webpackNfdKeys.map(key => key.normalize('NFC'));
+
+// '가방.jpg' -> '/static/media/가방.a8b4c2.jpg' 맵(Map) 생성
+const imagePathMap = new Map();
+allImages.forEach((imageInfo) => {
+    const storeNfcPath = `./${imageInfo.src}`.normalize('NFC');
+    const webpackKeyIndex = webpackNfcKeys.indexOf(storeNfcPath);
+    if (webpackKeyIndex !== -1) {
+        const originalNfdKey = webpackNfdKeys[webpackKeyIndex];
+        // 맵에 저장: { "가방.jpg" => "/static/media/..." }
+        imagePathMap.set(imageInfo.src, imageContext(originalNfdKey));
+    }
+});
+// --- 맵 생성 완료 -
 
 
 
 const NewTotalPage = () => {
-    // const [modelStop, setModelStop] = useState(false);
-    const arrayForTest = Array.from({ length: 12 });
 
-    console.log(arrayForTest);
 
-    const SPACING_X = 0.25; //모델 간 간격
+    const [layouts, setLayouts] = useState([]);
 
-    //  X축 오프셋(중앙 정렬)을 배열의 실제 길이를 기준으로 '동적'으로 계산   // (전체 길이의 절반만큼 왼쪽으로 이동)
-    const dynamicXOffset = ((arrayForTest.length - 1) * SPACING_X) / 2;
+    useEffect(() => {
 
-    // const SPACING_Z = 2.0;
-    // const xOffset = ((COLUMNS - 1) * SPACING_X) / 2;
-    // const zOffset = ((5 - 1) * SPACING_Z) / 2;
+        const fetchAllLayouts = async () => {
+            try {
+                const res = await fetch(`${API_BASE}/api/allLayouts`);
+                const data = await res.json();
+                setLayouts(data)
+                console.log(">> 01 <<. TotalPage 불러온 Layout 데이터:", data);
+            } catch (err) {
+                console.error("❌ TotalPage Layout 데이터 불러오기 실패", err);
+            }
+        }
+        fetchAllLayouts();
 
-    // --- (변경) ---
-    // className 대신 inline style을 사용합니다.
-    // 캔버스가 렌더링될 공간을 확보하기 위해 div에 높이와 너비를 100%로 설정합니다.
-    // (이 div의 부모 요소가 화면 전체 높이를 가져야 합니다.)
-    const pageStyle = {
-        width: '100vw',
-        height: '100vh', // 뷰포트(화면) 전체 높이
-        backgroundColor: '#000000' // 배경색 추가 (구분을 위해)
-    };
+        const socket = io(API_BASE);
+        //  "new_layout" 이벤트(방송) 수신 대기
+        socket.on("new_layout", (newLayoutData) => {
+            console.log(">> 02 <<. 새 레이아웃 수신:", newLayoutData);
+            // state에 새 건물(레이아웃) 즉시 추가
+            setLayouts((prevLayouts) => [...prevLayouts, newLayoutData]);
+        });
+
+        //컴포넌트 언마운트 시 소켓 연결 해제
+        return () => {
+            socket.disconnect();
+        };
+    }, [])
 
 
 
     return (
         < div
-            // className={style.NewTotalPage}
-            style={pageStyle}
+            className={style.NewTotalPage}
         >
-            <Canvas camera={{ position: [0, 2, 7], fov: 20 }} > {/*  3D 씬을 렌더링할 캔버스  position:[x, y, z], fov(시야각):클 수록 광각렌즈*/}
-                <Suspense fallback={null}>{/*  모델이 로드될 때까지 대기 (fallback={null}은 로딩 중 아무것도 표시 안 함) */}
+            <Canvas dpr={[1, 2]} camera={{ fov: 65, position: [0, 5, 10] }} >
 
-                    {arrayForTest.map((_, index) => {
-                        const x = index * SPACING_X - dynamicXOffset;
-                        const z = 0;
-                        const y = 0;
-                        return (
+                <Suspense fallback={null}>
+                    <Stage environment="city" intensity={0.6}>
 
-                            <Model key={index}
-                                // modelStop={modelStop} 
-                                position={[x, y, z]}
-                                scale={0.2} />
-                        )
-                    })
-                    }
+                        {layouts.map((layout, index) => (
 
-                    <Environment preset="studio" intensity={2} /> {/*모델을 비추는 기본 조명 설정 (없으면 검게 보임)*/}
+
+                            <LayoutBuilding
+                                key={layout._id || index}
+                                columnsData={layout.columns}
+                                position={[(index % 5) * 3 - 6, 0, Math.floor(index / 5) * 3 - 3]}
+                                imagePathMap={imagePathMap}
+                            />
+                        ))
+                        }
+
+
+                    </Stage>
                 </Suspense>
-                <OrbitControls enableZoom={true} /> {/* 360도 회전 컨트롤러 (줌 비활성화, 자동 회전) */}
-            </Canvas>
+                <OrbitControls makeDefault />
+            </Canvas >
         </div >
 
 

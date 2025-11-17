@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import style from '../css/NewPlayPage.module.css';
-
+import currentNameStore from '../store/currentNameStore';
 import UserCanvas from '../components/UserCanvas';
 import { allImages } from '../store/outputImagesInfo.js';
+import { API_BASE } from '../store/ref';
+
 
 import potpack from 'potpack';
 const GAP = 20; // 👈 10px 여백
@@ -11,7 +13,9 @@ const CANVAS_HEIGHT = 800;
 // const CANVAS_HEIGHT = 600;
 
 const NewPlayPage = () => {
-
+    const currentName = currentNameStore((state) => state.currentName);
+    // console.log(currentName);
+    const [isFull, setIsFull] = useState(false);
     const [imgLoadNum, setImgLoadNum] = useState(12);
 
     const [signboardImages, setSignboardImages] = useState([]); // 12개 (가게)
@@ -89,8 +93,55 @@ const NewPlayPage = () => {
 
 
 
+    const saveLayoutToDB = async (layoutData) => {
+        console.log("db에 저장을 시작합니다..", layoutData);
+
+        // [중요] DB에는 webpackSrc(긴 경로)가 아닌, 원본 정보만 저장
+        const cleanLayoutData = layoutData.map(col => ({
+            width: col.width,
+            images: col.images.map(img => ({
+                id: img.id,
+                src: img.src, // "가방.jpg" 같은 원본 파일명
+                width: img.width,
+                height: img.height
+            }))
+        }));
+
+        try {
+            // 2단계에서 만들 '백엔드 API 서버'의 주소입니다.
+            const response = await fetch(`${API_BASE}/api/saveLayout`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user: currentName,
+                    columns: cleanLayoutData, // 깨끗한 데이터 전송
+                    createdAt: new Date(),
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('서버 응답 오류');
+            }
+
+            const result = await response.json();
+            console.log('레이아웃 저장 성공:', result);
+            alert("레이아웃이 성공적으로 저장되었습니다.");
+
+        } catch (error) {
+            console.error('레이아웃 저장 실패:', error);
+            alert("오류: 레이아웃 저장에 실패했습니다.");
+            setIsFull(false); // 👈 (선택) 저장 실패 시 다시 시도할 수 있게 함
+        }
+    };
+
+
     // click 핸들러
     const handleImgClicked = (clickedImage) => {
+        if (isFull) {
+            return;
+        }
         // console.log('클릭!!!', clickedImage);
         let foundSpot = false; // 이미지를 배치할 자리를 찾았는지 여부
 
@@ -159,14 +210,12 @@ const NewPlayPage = () => {
 
             // console.log('&&&&&&&&', newXOffset + newWidthWithGap)
 
-            //새 칼럼이 캔버스 너비 1800을 넘는가?
-            // if (newXOffset + newWidthWithGap > CANVAS_WIDTH) {
-            //     alert("가로 공간 부족!!");
-            //     return;
-            // }
+
             // [수정] newXOffset 대신 "총 너비 + 새 너비"로 1800을 검사합니다.
             if (totalCurrentWidth + newWidthWithGap > CANVAS_WIDTH) {
                 alert("가로 공간 부족!!");
+                setIsFull(true);// 👈 1. 상태를 '꽉 참'으로 변경
+                saveLayoutToDB(newColumns); // 👈 2. DB 저장 함수 호출
                 return;
             }
             if (newHeightWithGap > CANVAS_HEIGHT) {
